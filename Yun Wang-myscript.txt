@@ -1,8 +1,5 @@
 #!/bin/bash
 #Student name: Yun Wang, Student number:041069121
-#Course code: CST8102, Lab section: 302
-#Script file name: myscript
-#Description: This script is designed for lab08 and will display a menu for user to execute different functions on the menu.
 
 echo '**********Jeremy Wang is the designer**********'
 
