@@ -1,5 +1,4 @@
 #!/bin/bash
-#Student name: Yun Wang, Student number:041069121
 
 echo '**********Jeremy Wang is the designer**********'
 
