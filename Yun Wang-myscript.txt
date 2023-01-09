@@ -1,0 +1,175 @@
+#!/bin/bash
+#Student name: Yun Wang, Student number:041069121
+#Course code: CST8102, Lab section: 302
+#Script file name: myscript
+#Description: This script is designed for lab08 and will display a menu for user to execute different functions on the menu.
+
+echo '**********Jeremy Wang is the designer**********'
+
+# I put the menu options into a function called displayMenu so that it is convenient to call it later.
+function displayMenu () {
+	echo Please choose one of the following selections:
+	echo 'A to Create a user account'
+	echo 'B to Delete a user account'
+	echo 'C to Change Supplementary Group for a user account'
+	echo 'D to Change Initial Group for a user account'
+	echo 'E to Change default login shell for a user account'
+	echo 'F to Change account expiration date for a user account'
+	echo 'Q to quit'
+
+	echo "What would you like to do? pls select here: "
+}
+
+# a while loop to re-run the displayMenu function and execute different commands based user inputs
+while [[ "$choice" != "Q" ]] || [[ "$choice" != "q" ]]
+#while [ true ]
+do
+	displayMenu
+	read choice
+
+# Scenario 1
+if [ "$choice" = "A" ] || [ "$choice" = "a" ]
+then
+	echo '*******************************************************'
+	echo You entered "$choice", now you can create a user account. Pls enter your preferred Username, User\'s home dir and default login shell.
+        read -p "Username: " userName1
+        read -p "User's home directory: " homeDir
+        read -p "Default login shell: " loginShell1
+
+        sudo useradd -m -d "$homeDir" -s "$loginShell1" "$userName1"		# this command is used to create a user account with home directory and login shell
+	sleep 3
+
+	echo '*******************************************************'
+	grep "$userName1" /etc/passwd						# this command is used to show the last line of passwd file to verify if the user has been created
+	echo The user account "$userName1" has been successfully created!
+                
+	read -p "Press any key to continue......"
+	clear
+
+# Scenario 2
+elif [ "$choice" == "B" ] || [ "$choice" == "b" ]
+then
+	echo '*******************************************************'
+        echo You entered "$choice", now you can delete a user account.
+	read -p "Pls input the user you want to delete: " userName2
+
+	sleep 3
+
+	echo '*******************************************************'
+	sudo userdel -r "$userName2"
+	echo The user account "$userName2" has been successfully deleted.
+
+	read -p "Press any key to continue......"
+	clear
+
+# Scenario 3
+elif [ "$choice" == "C" ] || [ "$choice" == "c" ]
+then
+	echo '*******************************************************'
+        echo You entered "$choice", now you can add a supplementary group for a user account.
+	read -p "Pls input the user name: " userName3
+	read -p "Pls input the supplementary group name you want to add: " groupName1
+        
+	sudo groupadd "$groupName1"			# a group must be existent before it is set to a user's supplementary group, so I create a group first
+	echo '*******************************************************'
+	sudo usermod -G "$groupName1" "$userName3"		# then I can use that group to be the supplementary group
+	sleep 3
+	groups "$userName3"				# verify the groups the user belong to, the output should contain both initial and supplementary groups
+	echo The supplementary group for "$userName3" has been successfully set up.
+
+	read -p "Press any key to continue......"
+	clear
+
+# Scenario 4
+elif [ "$choice" == "D" ] || [ "$choice" == "d" ]
+then
+	echo '*******************************************************'
+        echo You entered "$choice", now you can change the initial group for a user account.
+	read -p "Pls input the user name: " userName4
+	read -p "Pls input the original initial group name: " groupName2
+
+	echo The groups that "$userName4" originally belong to are:
+	groups "$userName4"		# first check this user's original groups
+
+	echo '*******************************************************'
+	read -p "Now pls input the new group name you want to change to: " groupName3
+
+	sudo groupadd "$groupName3"	# create a new group and set it to be the initial group
+        sudo usermod -g "$groupName3" "$userName4"	
+	
+	echo The updated  groups that "$userName4" belong to are now:
+	groups "$userName4"		# check this user's groups again and compare to its original groups, you should see updates
+
+	echo The initial group for "$userName4" has been successfully changed.
+
+	read -p "Press any key to continue......"
+
+	clear
+
+# Scenario 5
+elif [ "$choice" == "E" ] || [ "$choice" == "e" ]
+then
+	echo '*******************************************************'
+        echo You entered "$choice", now you can change the default login shell for a user account.
+	read -p "Pls input the user name: " userName5
+	read -p "Pls input the original login shell name: " loginShell2
+
+	echo The original login shell of "$userName5" is:
+	grep "$userName5" /etc/passwd		# first check this user's original login shell
+
+	echo '*******************************************************'
+	read -p "Now pls input the new login shell you want to change to: " loginShell3
+	sudo chsh -s "$loginShell3" "$userName5"	# change its login shell
+
+	echo The updated login shell for "$userName5" now is:
+	grep "$userName5" /etc/passwd		# check its login shell again and you should see updates
+
+	echo The login shell of "$userName5" has been successfully changed.
+
+	read -p "Press any key to continue......"
+
+	clear
+
+# Scenario 6
+elif [ "$choice" == "F" ] || [ "$choice" == "f" ]
+then
+	echo '*******************************************************'
+        echo You entered "$choice", now you can set/change the expiration date of a user account.
+	
+	read -p "Pls input the user name: " userName6
+	echo Pls check this user\'s original expiration date:
+	sudo chage -l "$userName6"		# first check this user's original expiration date
+	echo '*******************************************************'
+	sleep 3
+
+	read -p "Now pls input the expiration date(YYYY-MM-DD) you want to set up: " expDate
+	sudo usermod -e "$expDate" "$userName6"	# change its expiration date
+
+	echo Pls check this user\'s updated expiration date:
+	sudo chage -l "$userName6"		# check again and you should see updates
+
+	echo '*******************************************************'
+	echo The expiration date of "$userName6" has been successfully set/changed.
+
+	read -p "Press any key to continue"
+
+	clear
+
+# Scenario 7
+elif [ "$choice" == "Q" ] || [ "$choice" == "q" ]
+then
+	echo '*******************************************************'
+        echo The application is powering off......
+	sleep 3
+
+	exit
+
+# Scenario 8
+else
+	echo '*******************************************************'
+	echo Invalid Option, pls try again.
+	sleep 3
+
+	clear
+fi
+done
